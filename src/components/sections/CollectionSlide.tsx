@@ -1,173 +1,265 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { useRef, useEffect } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
 import { PRODUCTS } from "@/lib/constants";
 
 const allProducts = [...PRODUCTS.mistCollection, ...PRODUCTS.hangingCollection];
 
-export default function CollectionSlide() {
-  const [current, setCurrent] = useState(0);
-  const product = allProducts[current];
+function ProductSlide({
+  product,
+  index,
+}: {
+  product: (typeof allProducts)[0];
+  index: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
 
-  const next = () => setCurrent((p) => (p + 1) % allProducts.length);
-  const prev = () => setCurrent((p) => (p - 1 + allProducts.length) % allProducts.length);
+  useEffect(() => {
+    if (!ref.current) return;
+    const el = ref.current;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        el.querySelector(".product-image"),
+        { opacity: 0, x: -80, filter: "blur(15px)" },
+        {
+          opacity: 1,
+          x: 0,
+          filter: "blur(0px)",
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 60%",
+            end: "top 20%",
+            toggleActions: "play none none reverse",
+          },
+        }
+      );
+
+      gsap.fromTo(
+        el.querySelector(".product-info"),
+        { opacity: 0, x: 80, filter: "blur(15px)" },
+        {
+          opacity: 1,
+          x: 0,
+          filter: "blur(0px)",
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 55%",
+            end: "top 15%",
+            toggleActions: "play none none reverse",
+          },
+        }
+      );
+    }, ref);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 sm:px-6">
-      {/* Section header */}
-      <div className="text-center mb-8">
-        <span className="text-[10px] sm:text-xs font-inter font-bold uppercase tracking-[0.2em] text-gold-dark block">
-          Our Collection
-        </span>
-        <h2 className="mt-2 font-cormorant text-2xl sm:text-4xl font-light text-ink">
-          India&apos;s Favorite Luxury Car Fragrances
-        </h2>
-      </div>
-
-      {/* Product showcase — one at a time */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={product.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-10 items-center"
-        >
-          {/* LEFT — Product Image */}
-          <div className="lg:col-span-5 order-1">
+    <div
+      ref={ref}
+      className="min-h-screen flex items-center px-6 md:px-12 lg:px-24"
+    >
+      <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-center">
+        {/* LEFT — Product Image */}
+        <div className="product-image flex justify-center lg:justify-end">
+          <div className="relative w-full max-w-sm">
+            {/* Bottle */}
             <div
-              className="relative aspect-[4/3] w-full overflow-hidden border border-black/10"
-              style={{ background: product.color + "15" }}
+              className="relative mx-auto"
+              style={{ width: "200px", height: "320px" }}
             >
-              {/* Placeholder product visual */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative">
-                  {/* Bottle shape */}
-                  <div
-                    className="w-24 sm:w-32 h-40 sm:h-52 relative"
-                    style={{
-                      background: `linear-gradient(180deg, ${product.accentColor}50, ${product.color})`,
-                      borderRadius: "4px 4px 2px 2px",
-                      boxShadow: `0 20px 60px ${product.color}60`,
-                    }}
+              {/* Main body */}
+              <div
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 rounded-sm"
+                style={{
+                  width: "140px",
+                  height: "220px",
+                  background: `linear-gradient(180deg, ${product.accentColor}15 0%, ${product.color} 40%, ${product.color} 100%)`,
+                  border: `1px solid ${product.accentColor}20`,
+                  boxShadow: `0 30px 80px ${product.color}80, 0 0 40px ${product.accentColor}15`,
+                }}
+              >
+                {/* Label accent line */}
+                <div
+                  className="absolute top-1/3 left-6 right-6 h-[1px]"
+                  style={{ background: `${product.accentColor}40` }}
+                />
+                {/* Brand */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+                  <span
+                    className="text-[8px] tracking-[0.4em] uppercase font-bold block"
+                    style={{ color: product.accentColor }}
                   >
-                    <div
-                      className="absolute -top-5 left-1/2 -translate-x-1/2 w-8 h-5 rounded-t-sm"
-                      style={{ background: product.accentColor }}
-                    />
-                    <div
-                      className="absolute top-1/2 left-3 right-3 h-[1px]"
-                      style={{ background: `${product.accentColor}60` }}
-                    />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-                      <span
-                        className="text-[7px] tracking-[0.3em] uppercase font-bold"
-                        style={{ color: product.accentColor }}
-                      >
-                        AutoRoma
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Glow */}
-                  <div
-                    className="absolute -inset-10 rounded-full -z-10 opacity-30"
-                    style={{
-                      background: `radial-gradient(circle, ${product.accentColor}30, transparent 70%)`,
-                    }}
-                  />
+                    AutoRoma
+                  </span>
+                  <span
+                    className="text-[6px] tracking-[0.2em] uppercase block mt-1 opacity-50"
+                    style={{ color: product.accentColor }}
+                  >
+                    {product.name}
+                  </span>
                 </div>
               </div>
 
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
+              {/* Neck */}
+              <div
+                className="absolute left-1/2 -translate-x-1/2 rounded-t-sm"
+                style={{
+                  width: "30px",
+                  height: "50px",
+                  bottom: "220px",
+                  background: product.accentColor,
+                  boxShadow: `0 -5px 20px ${product.accentColor}40`,
+                }}
+              />
+
+              {/* Cap */}
+              <div
+                className="absolute left-1/2 -translate-x-1/2"
+                style={{
+                  width: "40px",
+                  height: "30px",
+                  bottom: "270px",
+                  background: `linear-gradient(180deg, ${product.accentColor}, ${product.accentColor}cc)`,
+                  borderRadius: "2px 2px 0 0",
+                }}
+              />
+
+              {/* Ambient glow */}
+              <div
+                className="absolute -inset-16 -z-10 rounded-full"
+                style={{
+                  background: `radial-gradient(circle, ${product.accentColor}12, transparent 70%)`,
+                }}
+              />
             </div>
-          </div>
 
-          {/* RIGHT — Product Info */}
-          <div className="lg:col-span-7 order-2 space-y-4 sm:space-y-5">
-            {/* Scent family label */}
-            <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold text-ink/40 font-inter block">
-              {product.notes.join(" · ")}
-            </span>
-
-            {/* Product name */}
-            <h3 className="font-cormorant text-3xl sm:text-4xl lg:text-5xl font-light text-ink leading-tight">
-              {product.name}
-            </h3>
-
-            {/* Description */}
-            <p className="text-sm sm:text-base text-ink/50 font-inter font-light leading-relaxed max-w-md">
-              {product.description}
-            </p>
-
-            {/* Scent notes */}
-            <div className="flex flex-wrap gap-2 pt-1">
-              {product.notes.map((note) => (
-                <span
-                  key={note}
-                  className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] font-bold px-3 py-1.5 border border-black/10 text-ink/50 font-inter"
-                >
-                  {note}
-                </span>
-              ))}
-            </div>
-
-            {/* Price + CTA */}
-            <div className="flex items-center gap-6 pt-4 border-t border-black/10">
-              <span className="text-2xl sm:text-3xl font-inter font-semibold text-ink">
+            {/* Price tag floating */}
+            <div
+              className="absolute -right-2 bottom-16 px-4 py-2 text-center"
+              style={{
+                background: "#0a0a0a",
+                border: `1px solid ${product.accentColor}30`,
+              }}
+            >
+              <span className="block text-xl font-semibold text-white font-inter">
                 ₹{product.price}
               </span>
-              <button
-                className="px-6 py-3 bg-ink text-white text-[11px] uppercase tracking-[0.2em] font-bold font-inter
-                           hover:bg-ink-light transition-colors duration-300"
-              >
-                Add to Bag
-              </button>
+              <span className="block text-[8px] tracking-[0.2em] uppercase text-white/30 font-inter">
+                MRP Inclusive
+              </span>
             </div>
           </div>
-        </motion.div>
-      </AnimatePresence>
-
-      {/* Navigation */}
-      <div className="flex items-center justify-between mt-8">
-        <button
-          onClick={prev}
-          className="p-3 border border-black/15 text-ink/50 hover:text-ink hover:border-ink/40 transition-all duration-300"
-        >
-          <FiChevronLeft className="w-5 h-5" strokeWidth={1.5} />
-        </button>
-
-        {/* Dots */}
-        <div className="flex items-center gap-2">
-          {allProducts.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === current
-                  ? "w-8 bg-gold"
-                  : "w-1.5 bg-black/15 hover:bg-black/30"
-              }`}
-            />
-          ))}
         </div>
 
-        <button
-          onClick={next}
-          className="p-3 border border-black/15 text-ink/50 hover:text-ink hover:border-ink/40 transition-all duration-300"
-        >
-          <FiChevronRight className="w-5 h-5" strokeWidth={1.5} />
-        </button>
+        {/* RIGHT — Product Info */}
+        <div className="product-info space-y-6">
+          {/* Number */}
+          <span className="text-[10px] tracking-[0.3em] uppercase text-gold/60 font-inter font-bold">
+            {String(index + 1).padStart(2, "0")} / {String(allProducts.length).padStart(2, "0")}
+          </span>
+
+          {/* Name */}
+          <h2 className="font-cormorant text-4xl sm:text-5xl lg:text-6xl font-light text-white leading-[1.1]">
+            {product.name}
+          </h2>
+
+          {/* Description */}
+          <p className="text-sm sm:text-base text-white/40 font-inter font-light leading-relaxed max-w-md">
+            {product.description}
+          </p>
+
+          {/* Scent notes */}
+          <div className="flex flex-wrap gap-2">
+            {product.notes.map((note) => (
+              <span
+                key={note}
+                className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold px-4 py-2 font-inter"
+                style={{
+                  color: product.accentColor,
+                  border: `1px solid ${product.accentColor}25`,
+                  background: `${product.accentColor}08`,
+                }}
+              >
+                {note}
+              </span>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <div className="flex items-center gap-5 pt-4">
+            <button
+              className="px-8 py-3.5 text-[11px] uppercase tracking-[0.2em] font-bold font-inter text-black transition-all duration-300 hover:shadow-[0_0_30px_rgba(201,169,110,0.25)]"
+              style={{
+                background: `linear-gradient(135deg, ${product.accentColor}, ${product.accentColor}cc)`,
+              }}
+            >
+              Add to Bag
+            </button>
+            <button className="px-8 py-3.5 text-[11px] uppercase tracking-[0.2em] font-bold font-inter text-white/60 border border-white/10 hover:border-white/30 hover:text-white transition-all duration-300">
+              Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function CollectionSlide() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        ".collection-header",
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".collection-header",
+            start: "top 70%",
+          },
+        }
+      );
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <div ref={containerRef}>
+      {/* Section header */}
+      <div className="collection-header text-center pt-20 pb-10 px-6 opacity-0">
+        <span className="text-[10px] sm:text-xs font-inter font-bold uppercase tracking-[0.25em] text-gold block">
+          Our Collection
+        </span>
+        <h2 className="mt-3 font-cormorant text-3xl sm:text-4xl lg:text-5xl font-light text-white">
+          Crafted for Every Journey
+        </h2>
       </div>
 
-      {/* Counter */}
-      <p className="text-center mt-3 text-[10px] tracking-[0.2em] uppercase text-ink/30 font-inter">
-        {String(current + 1).padStart(2, "0")} / {String(allProducts.length).padStart(2, "0")}
-      </p>
+      {/* Products — one per screen */}
+      {allProducts.map((product, i) => (
+        <ProductSlide key={product.id} product={product} index={i} />
+      ))}
     </div>
   );
 }

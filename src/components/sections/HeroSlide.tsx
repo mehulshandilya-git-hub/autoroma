@@ -3,176 +3,94 @@
 import { useRef, useEffect } from "react";
 import gsap from "gsap";
 
-interface CharProps {
-  char: string;
-  index: number;
-  isAccent?: boolean;
-  sx: string;
-  sy: string;
-  rot: string;
-}
-
-function HeroChar({ char, index, isAccent, sx, sy, rot }: CharProps) {
-  return (
-    <span
-      className={`hero-char ${isAccent ? "is-accent" : ""}`}
-      style={{
-        ["--sx" as string]: sx,
-        ["--sy" as string]: sy,
-        ["--rot" as string]: rot,
-        ["--i" as string]: index,
-      }}
-    >
-      {char}
-    </span>
-  );
-}
-
-interface WordDef {
-  text: string;
-  accentStart?: number;
-  accentEnd?: number;
-}
+const LETTERS = "AUTOROMA".split("");
 
 export default function HeroSlide() {
   const ref = useRef<HTMLDivElement>(null);
 
-  const titleLine1: WordDef[] = [
-    { text: "AutoRoma", accentStart: 0, accentEnd: 4 },
-  ];
-  const titleLine2: WordDef[] = [
-    { text: "Premium" },
-    { text: "Car" },
-    { text: "Fragrances" },
-  ];
-
-  // Generate random scatter positions for each character
-  const scatterPositions = useRef(
-    Array.from({ length: 50 }, () => ({
-      sx: `${(Math.random() - 0.5) * 120}vw`,
-      sy: `${(Math.random() - 0.5) * 100}vh`,
-      rot: `${(Math.random() - 0.5) * 80}deg`,
-    }))
-  );
-
   useEffect(() => {
     if (!ref.current) return;
-    const chars = ref.current.querySelectorAll(".hero-char");
-    const block = ref.current.querySelector(".hero-block");
+    const title = ref.current.querySelector(".hero-title");
+    const subtitle = ref.current.querySelector(".hero-subtitle");
+    const cta = ref.current.querySelector(".hero-cta");
 
     const ctx = gsap.context(() => {
-      // Characters start scattered, then assemble
-      chars.forEach((char, i) => {
-        const pos = scatterPositions.current[i] || { sx: "0vw", sy: "0vh", rot: "0deg" };
-        gsap.set(char, {
-          x: pos.sx,
-          y: pos.sy,
-          rotation: pos.rot,
-          opacity: 0,
-          scale: 2,
-        });
-      });
-
-      if (block) {
-        gsap.set(block, { opacity: 0, y: 30 });
-      }
+      gsap.set([subtitle, cta], { opacity: 0, y: 20 });
     }, ref);
 
-    return () => ctx.revert();
-  }, []);
+    const tl = gsap.timeline({ delay: 0.3 });
 
-  // Expose animation method
-  useEffect(() => {
-    if (!ref.current) return;
-    const chars = ref.current.querySelectorAll(".hero-char");
-    const block = ref.current.querySelector(".hero-block");
+    // Each letter animates in with stagger
+    ref.current.querySelectorAll(".hero-letter").forEach((letter, i) => {
+      tl.fromTo(
+        letter,
+        {
+          opacity: 0,
+          y: 80,
+          rotationX: -90,
+          filter: "blur(10px)",
+        },
+        {
+          opacity: 1,
+          y: 0,
+          rotationX: 0,
+          filter: "blur(0px)",
+          duration: 0.6,
+          ease: "power3.out",
+        },
+        i * 0.07
+      );
+    });
 
-    // Store animation on element for parent to call
-    (ref.current as any).__animate = () => {
-      const tl = gsap.timeline();
+    tl.to(subtitle, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.3");
+    tl.to(cta, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.5");
 
-      chars.forEach((char, i) => {
-        tl.to(
-          char,
-          {
-            x: 0,
-            y: 0,
-            rotation: 0,
-            opacity: 1,
-            scale: 1,
-            duration: 0.8,
-            ease: "power3.out",
-          },
-          i * 0.02
-        );
-      });
-
-      if (block) {
-        tl.to(block, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.4");
-      }
-
-      return tl;
+    return () => {
+      ctx.revert();
+      tl.kill();
     };
   }, []);
 
   return (
-    <div ref={ref} className="mx-auto max-w-3xl px-4 text-center text-white">
-      <p className="font-display text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
-        {titleLine1.map((word, wi) =>
-          word.text.split("").map((c, ci) => {
-            const globalIndex =
-              titleLine1.slice(0, wi).reduce((a, w) => a + w.text.length, 0) + ci;
-            const pos = scatterPositions.current[globalIndex];
-            return (
-              <HeroChar
-                key={`${wi}-${ci}`}
-                char={c}
-                index={globalIndex}
-                isAccent={
-                  word.accentStart !== undefined &&
-                  ci >= word.accentStart &&
-                  ci < (word.accentEnd ?? word.text.length)
-                }
-                sx={pos?.sx || "0vw"}
-                sy={pos?.sy || "0vh"}
-                rot={pos?.rot || "0deg"}
-              />
-            );
-          })
-        )}
+    <div ref={ref} className="flex flex-col items-center justify-center text-center px-4">
+      {/* AUTOROMA — big bold title */}
+      <div className="hero-title flex items-center justify-center" style={{ perspective: "600px" }}>
+        {LETTERS.map((letter, i) => (
+          <span
+            key={i}
+            className="hero-letter inline-block opacity-0"
+            style={{
+              fontSize: "clamp(4rem, 12vw, 10rem)",
+              fontWeight: 800,
+              letterSpacing: "0.08em",
+              lineHeight: 1,
+              color: "#c9a96e",
+              textShadow: "0 0 60px rgba(201,169,110,0.3), 0 4px 30px rgba(0,0,0,0.5)",
+              transformOrigin: "bottom center",
+            }}
+          >
+            {letter}
+          </span>
+        ))}
+      </div>
+
+      {/* Divider line */}
+      <div
+        className="hero-subtitle mt-6 opacity-0"
+        style={{
+          width: "120px",
+          height: "1px",
+          background: "linear-gradient(90deg, transparent, #c9a96e, transparent)",
+        }}
+      />
+
+      {/* Subtitle */}
+      <p className="hero-subtitle mt-6 max-w-lg text-base text-white/50 font-light tracking-[0.15em] uppercase opacity-0">
+        Premium Car Fragrances
       </p>
-      <h1 className="mt-4 font-display text-3xl font-medium leading-tight sm:text-4xl md:text-5xl">
-        {titleLine2.map((word, wi) => {
-          const offset = titleLine1.reduce((a, w) => a + w.text.length, 0);
-          return (
-            <span key={wi} className="mr-3 last:mr-0">
-              {word.text.split("").map((c, ci) => {
-                const globalIndex =
-                  offset +
-                  titleLine2.slice(0, wi).reduce((a, w) => a + w.text.length, 0) +
-                  ci;
-                const pos = scatterPositions.current[globalIndex];
-                return (
-                  <HeroChar
-                    key={`${wi}-${ci}`}
-                    char={c}
-                    index={globalIndex}
-                    sx={pos?.sx || "0vw"}
-                    sy={pos?.sy || "0vh"}
-                    rot={pos?.rot || "0deg"}
-                  />
-                );
-              })}
-            </span>
-          );
-        })}
-      </h1>
-      <p
-        className="hero-block mx-auto mt-6 max-w-xl text-base text-white/60 sm:text-lg font-light"
-      >
-        Luxury fragrances crafted for every journey. Transform your drive with the finest scents.
-      </p>
-      <div className="hero-block mt-8 flex flex-wrap items-center justify-center gap-3">
+
+      {/* CTA */}
+      <div className="hero-cta mt-10 flex flex-wrap items-center justify-center gap-4 opacity-0">
         <a className="btn-primary" href="#collection">
           Explore Collection
         </a>

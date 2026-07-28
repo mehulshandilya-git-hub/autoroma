@@ -14,11 +14,14 @@ import WhySlide from "@/components/sections/WhySlide";
 import StorySlide from "@/components/sections/StorySlide";
 import CtaSlide from "@/components/sections/CtaSlide";
 
-const slides = [
+const introSlides = [
   { id: "hero", content: <HeroSlide />, bg: "dark" as const },
   { id: "why", content: <WhySlide />, bg: "dark" as const },
+];
+
+const outroSlides = [
   { id: "story", content: <StorySlide />, bg: "dark" as const },
-  { id: "cta", content: <CtaSlide />, bg: "light" as const },
+  { id: "cta", content: <CtaSlide />, bg: "dark" as const },
 ];
 
 export default function Home() {
@@ -38,13 +41,16 @@ export default function Home() {
           <main className="bg-ink">
             <Navbar />
 
-            {/* Hero + Intro slides — zoom journey */}
-            <ZoomJourney slides={slides} />
+            {/* Hero + Why — zoom journey intro */}
+            <ZoomJourney slides={introSlides} />
 
             {/* Collection — each product is one full screen */}
             <div id="collection">
               <CollectionSlide />
             </div>
+
+            {/* Story + CTA — zoom journey outro */}
+            <ZoomJourney slides={outroSlides} />
 
             {/* Footer */}
             <Footer />

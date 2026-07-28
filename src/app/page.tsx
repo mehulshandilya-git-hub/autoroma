@@ -16,7 +16,7 @@ import CtaSlide from "@/components/sections/CtaSlide";
 
 const slides = [
   { id: "hero", content: <HeroSlide />, bg: "dark" as const },
-  { id: "why", content: <WhySlide />, bg: "light" as const },
+  { id: "why", content: <WhySlide />, bg: "dark" as const },
   { id: "story", content: <StorySlide />, bg: "dark" as const },
   { id: "cta", content: <CtaSlide />, bg: "light" as const },
 ];

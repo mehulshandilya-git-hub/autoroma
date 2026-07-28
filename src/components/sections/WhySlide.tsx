@@ -31,7 +31,7 @@ export default function WhySlide() {
       <p className="text-sm font-semibold uppercase tracking-[0.18em] text-gold">
         Why AutoRoma
       </p>
-      <h2 className="mt-3 font-display text-3xl font-medium tracking-tight md:text-5xl">
+      <h2 className="mt-3 font-display text-3xl font-medium tracking-tight md:text-5xl gold-gradient">
         A path to a better drive
       </h2>
 
@@ -44,7 +44,7 @@ export default function WhySlide() {
                 {String(i + 1).padStart(2, "0")}
               </p>
             </div>
-            <h3 className="mt-2 font-display text-xl">{feature.title}</h3>
+            <h3 className="mt-2 font-display text-xl text-white">{feature.title}</h3>
             <p className="mt-2 text-sm text-white/50 font-light">
               {feature.description}
             </p>

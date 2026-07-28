@@ -24,7 +24,6 @@ export const metadata: Metadata = {
     "luxury car accessories",
     "AutoRoma",
     "car perfume",
-    "premium car fragrance",
   ],
   openGraph: {
     title: "AutoRoma | Premium Car Fragrances",
@@ -43,7 +42,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="min-h-screen bg-black text-white antialiased noise-overlay">
+      <body className="min-h-screen bg-ink text-white antialiased">
         {children}
       </body>
     </html>

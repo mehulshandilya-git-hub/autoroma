@@ -1,23 +1,26 @@
 "use client";
 
-import { useState, useCallback, lazy, Suspense } from "react";
+import { useState, useCallback } from "react";
 import IntroLoader from "@/components/ui/IntroLoader";
 import CustomCursor from "@/components/ui/CustomCursor";
 import Navbar from "@/components/ui/Navbar";
 import SmoothScroll from "@/components/ui/SmoothScroll";
-import SectionDivider from "@/components/ui/SectionDivider";
-
-import HeroSection from "@/components/sections/HeroSection";
-import WhyAutoroma from "@/components/sections/WhyAutoroma";
-import MistCollection from "@/components/sections/MistCollection";
-import HangingCollection from "@/components/sections/HangingCollection";
-import CarExperience from "@/components/sections/CarExperience";
-import ScentNotes from "@/components/sections/ScentNotes";
-import PremiumQuality from "@/components/sections/PremiumQuality";
-import InteractiveShowcase from "@/components/sections/InteractiveShowcase";
-import CTASection from "@/components/sections/CTASection";
+import ZoomJourney from "@/components/ui/ZoomJourney";
 import Footer from "@/components/sections/Footer";
-import BackgroundCanvas from "@/components/three/BackgroundCanvas";
+
+import HeroSlide from "@/components/sections/HeroSlide";
+import CollectionSlide from "@/components/sections/CollectionSlide";
+import WhySlide from "@/components/sections/WhySlide";
+import StorySlide from "@/components/sections/StorySlide";
+import CtaSlide from "@/components/sections/CtaSlide";
+
+const slides = [
+  { id: "hero", content: <HeroSlide />, bg: "dark" as const },
+  { id: "collection", content: <CollectionSlide />, bg: "light" as const },
+  { id: "why", content: <WhySlide />, bg: "dark" as const },
+  { id: "story", content: <StorySlide />, bg: "light" as const },
+  { id: "cta", content: <CtaSlide />, bg: "dark" as const },
+];
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
@@ -28,47 +31,14 @@ export default function Home() {
 
   return (
     <>
-      {/* Intro Loader */}
       {isLoading && <IntroLoader onComplete={handleLoaderComplete} />}
-
-      {/* Custom Cursor */}
       <CustomCursor />
 
-      {/* Background Canvas */}
-      <BackgroundCanvas />
-
-      {/* Main Content */}
       {!isLoading && (
         <SmoothScroll>
-          <main className="relative z-10">
+          <main>
             <Navbar />
-
-            <HeroSection />
-
-            <SectionDivider label="Why AutoRoma" />
-            <WhyAutoroma />
-
-            <SectionDivider label="Mist Collection" />
-            <MistCollection />
-
-            <SectionDivider label="Hanging Collection" />
-            <HangingCollection />
-
-            <SectionDivider label="The Experience" />
-            <CarExperience />
-
-            <SectionDivider label="Scent Notes" />
-            <ScentNotes />
-
-            <SectionDivider label="Premium Quality" />
-            <PremiumQuality />
-
-            <SectionDivider label="Interactive" />
-            <InteractiveShowcase />
-
-            <SectionDivider />
-            <CTASection />
-
+            <ZoomJourney slides={slides} />
             <Footer />
           </main>
         </SmoothScroll>

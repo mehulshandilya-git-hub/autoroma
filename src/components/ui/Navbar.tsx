@@ -1,52 +1,65 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
 export default function Navbar() {
-  const navRef = useRef<HTMLElement>(null);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <motion.nav
-      ref={navRef}
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1, delay: 3.8, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed top-0 left-0 right-0 z-[100] px-6 md:px-12 lg:px-24 py-6 flex items-center justify-between"
-      style={{
-        background: "linear-gradient(to bottom, rgba(0,0,0,0.8), transparent)",
-      }}
+    <nav
+      className={`sticky top-0 z-[60] border-b text-white backdrop-blur-md transition-colors duration-300 ${
+        scrolled ? "border-white/10 bg-ink/95" : "border-white/5 bg-ink/70"
+      }`}
     >
-      <a href="#" className="flex items-center gap-1" data-cursor-hover>
-        <span className="text-xl tracking-[0.2em] uppercase font-light">
-          <span className="gold-gradient">Auto</span>
-          <span className="text-white">Roma</span>
-        </span>
-      </a>
-
-      <div className="hidden md:flex items-center gap-10">
-        {["Collections", "Mist", "Hanging", "About"].map((item) => (
-          <a
-            key={item}
-            href={`#${item.toLowerCase()}`}
-            className="text-[11px] tracking-[0.3em] uppercase text-white/40 font-light hover:text-gold transition-colors duration-300"
-            data-cursor-hover
-          >
-            {item}
+      <div className="mx-auto max-w-7xl px-6 md:px-12 lg:px-24">
+        <div className="relative z-[61] flex h-16 items-center justify-between">
+          {/* Logo */}
+          <a href="#" className="inline-flex items-center gap-0.5">
+            <span className="text-xl tracking-[0.2em] uppercase font-light">
+              <span className="text-gold">Auto</span>
+              <span className="text-white">Roma</span>
+            </span>
           </a>
-        ))}
-      </div>
 
-      <button
-        className="text-[11px] tracking-[0.2em] uppercase px-6 py-2.5 transition-all duration-500 hover:shadow-[0_0_20px_rgba(201,169,110,0.15)]"
-        style={{
-          border: "1px solid rgba(201,169,110,0.25)",
-          color: "#c9a96e",
-        }}
-        data-cursor-magnetic
-      >
-        Shop
-      </button>
-    </motion.nav>
+          {/* Desktop nav */}
+          <div className="hidden items-center gap-1 md:flex">
+            <a className="px-3 py-2 text-sm transition-colors text-gold" href="/">
+              Home
+            </a>
+            <a className="px-3 py-2 text-sm transition-colors text-white/70 hover:text-white" href="#collection">
+              Collections
+            </a>
+            <a className="px-3 py-2 text-sm transition-colors text-white/70 hover:text-white" href="#about">
+              About
+            </a>
+            <a
+              className="btn-primary ml-3"
+              href="https://www.autoroma.in"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Shop
+            </a>
+          </div>
+
+          {/* Mobile CTA */}
+          <a
+            className="btn-primary px-3 py-2 text-xs md:hidden"
+            href="https://www.autoroma.in"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Shop
+          </a>
+        </div>
+      </div>
+    </nav>
   );
 }
